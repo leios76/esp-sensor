@@ -349,7 +349,7 @@ void get_config() {
       if (strcmp(new_version, version) != 0) {
         Serial.print("Updating ");
         Serial.println(new_version);
-        t_httpUpdate_return ret = ESPhttpUpdate.update("http://iot.nor.kr/esp/firmware/iot_" + String(new_version) + "_" + (int)(ESP.getFlashChipSize() / 1024 / 1024 ) + "M.bin");
+        t_httpUpdate_return ret = ESPhttpUpdate.update("http://iot.nor.kr/esp/firmware/esp-sensor_" + String(new_version) + "_" + (int)(ESP.getFlashChipSize() / 1024 / 1024 ) + "M.bin");
 
         switch (ret) {
           case HTTP_UPDATE_FAILED:
