@@ -323,7 +323,7 @@ void ssl_test() {
 void get_config() {
   HTTPClient http;
 
-  String url = "http://iot.nor.kr/esp/" + String(chip_id) + "/config.json";
+  String url = "http://iot.nor.kr/esp/devices/" + String(chip_id) + "/config.json";
 
   http.begin(url);
   Serial.println("Open url: " + url);
