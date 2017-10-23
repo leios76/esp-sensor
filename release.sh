@@ -10,4 +10,5 @@ rm -Rf build && mkdir -p build && ${ARDUINO_IDE} --verify --board esp8266com:esp
 
 rm -Rf build && mkdir -p build && ${ARDUINO_IDE} --verify --board esp8266com:esp8266:d1_mini_lite:FlashSize=1M256 --pref build.path=./build ${PROJECT}.ino && mv build/${PROJECT}.ino.bin ./${PROJECT}_${VERSION}_1M.bin
 
+scp -P 2222 ${PROJECT}_${VERSION}_*.bin root@nor.kr:/mnt/coreos1/iot/var/www/iot/esp/firmware/
 
