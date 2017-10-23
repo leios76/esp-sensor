@@ -3,7 +3,7 @@
   TODO:
   - RTC memory
 */
-const char * version = "1.1-dev";
+const char * version = "1.1";
 
 const char * server = "iot.nor.kr";
 const char * APIKEY = "";
