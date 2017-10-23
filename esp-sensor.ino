@@ -3,7 +3,7 @@
   TODO:
   - RTC memory
 */
-const char * version = "1.0";
+const char * version = "1.1";
 
 const char * server = "iot.nor.kr";
 const char * APIKEY = "";
@@ -215,6 +215,7 @@ void setup_wifi() {
     column++;
     if ((column % 80) == 0) {
       Serial.println("");
+      Serial.print(String(chip_id) + ": ");
     }
     //Serial.println(WiFi.smartConfigDone());
     if (retry_count-- == 0) {
@@ -322,7 +323,7 @@ void ssl_test() {
 void get_config() {
   HTTPClient http;
 
-  String url = "http://iot.nor.kr/esp/" + String(chip_id) + "/config.json";
+  String url = "http://iot.nor.kr/esp/devices/" + String(chip_id) + "/config.json";
 
   http.begin(url);
   Serial.println("Open url: " + url);
