@@ -3,7 +3,7 @@
   TODO:
   - RTC memory
 */
-const char * version = "1.0";
+const char * version = "1.1-dev";
 
 const char * server = "iot.nor.kr";
 const char * APIKEY = "";
@@ -215,6 +215,7 @@ void setup_wifi() {
     column++;
     if ((column % 80) == 0) {
       Serial.println("");
+      Serial.print(String(chip_id) + ": ");
     }
     //Serial.println(WiFi.smartConfigDone());
     if (retry_count-- == 0) {
