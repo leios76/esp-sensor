@@ -3,9 +3,10 @@
   TODO:
   - RTC memory
 */
-const char * version = "1.1";
+const char * version = "1.2";
 
 const char * server = "iot.nor.kr";
+const char * ADMIN_APIKEY = "0fbb63ec236e0c8d66df2f4a8cb56234";
 const char * APIKEY = "";
 const char * SSIDNAME = "";
 const char * PASSWORD = "";
@@ -47,7 +48,7 @@ void sendTeperatureApi(char * str_address, float temp) {
     return;
   }
   String postStr = "apikey=" + String(APIKEY);
-  postStr += "&node=temp";
+  postStr += "&node=ds18b20";
   postStr += "&data={" + String(str_address) + ":" + String((int)(temp * 1000)) + "}";
 
   Serial.print("Request: ");
@@ -96,10 +97,10 @@ void report_temperature() {
 }
 
 void report_board() {
-  if (strlen(APIKEY) == 0) {
+  if (strlen(ADMIN_APIKEY) == 0) {
     return;
   }
-  String postStr = "apikey=" + String(APIKEY);
+  String postStr = "apikey=" + String(ADMIN_APIKEY);
   postStr += "&node=";
   postStr += String(chip_id);
   postStr += "&data=";
