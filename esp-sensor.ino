@@ -96,15 +96,38 @@ void report_temperature() {
   }
 }
 
-void report_board() {
+void report_admin() {
   if (strlen(ADMIN_APIKEY) == 0) {
     return;
   }
   String postStr = "apikey=" + String(ADMIN_APIKEY);
+  postStr += "&node=esp-sensor";
+  postStr += "&data=";
+  postStr += "{" + String(chip_id) + ": " + String(version) + "}";
+
+  Serial.print("Request: ");
+  Serial.println(postStr);
+
+  HTTPClient http;
+
+  http.begin("http://iot.nor.kr/input/post");
+  http.addHeader("Content-Type", "application/x-www-form-urlencoded");
+  http.POST(postStr);
+  http.writeToStream(&Serial);
+
+  http.end();
+  Serial.println("");
+}
+
+void report_board() {
+  if (strlen(APIKEY) == 0) {
+    return;
+  }
+  String postStr = "apikey=" + String(APIKEY);
   postStr += "&node=";
   postStr += String(chip_id);
   postStr += "&data=";
-  postStr += "{vcc: " + String(analogRead(A0)) + ",ver:" + String(version) + "}";
+  postStr += "{vcc: " + String(analogRead(A0)) + "}";
 
   Serial.print("Request: ");
   Serial.println(postStr);
@@ -423,6 +446,7 @@ void loop() {
   Serial.println(WiFi.RSSI());
 
   report_temperature();
+  report_admin();
   report_board();
   //ssl_test();
 
