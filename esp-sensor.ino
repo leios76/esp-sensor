@@ -48,7 +48,7 @@ void sendTeperatureApi(char * str_address, float temp) {
     return;
   }
   String postStr = "apikey=" + String(APIKEY);
-  postStr += "&node=temp";
+  postStr += "&node=ds18b20";
   postStr += "&data={" + String(str_address) + ":" + String((int)(temp * 1000)) + "}";
 
   Serial.print("Request: ");
