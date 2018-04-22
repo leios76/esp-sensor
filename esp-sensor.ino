@@ -80,6 +80,7 @@ void sendTemperatureMQTT(char * str_address, float temp) {
 
   int8_t ret;
   char topic[64];
+  char data[200];
 
   if (strlen(MQTT_USERNAME) == 0 || strlen(MQTT_PASSWORD) == 0) {
     return;
@@ -105,9 +106,12 @@ void sendTemperatureMQTT(char * str_address, float temp) {
   }
 
   memset(topic, 0, sizeof(topic));
-  sprintf(topic, "sensor/%s/temperature/%s", MQTT_USERNAME, str_address);
+  memset(data, 0, sizeof(data));
+  sprintf(topic, "sensor/ds18b20/%s", str_address);
+  sprintf(data, "{\"temperature\": \"%.3f\"}", temp);
   Adafruit_MQTT_Publish mqtt_publish = Adafruit_MQTT_Publish(&mqtt, topic);
-  mqtt_publish.publish(temp);
+  mqtt_publish.publish(data);
+
   mqtt.disconnect();
 }
 
