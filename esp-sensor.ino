@@ -3,13 +3,19 @@
   TODO:
   - RTC memory
 */
-const char * version = "1.3";
+const char * version = "1.4";
 
 const char * server = "iot.nor.kr";
 const char * ADMIN_APIKEY = "0fbb63ec236e0c8d66df2f4a8cb56234";
 const char * APIKEY = "";
 const char * SSIDNAME = "";
 const char * PASSWORD = "";
+
+#define MQTT_SERVER      "nor.kr"
+#define MQTT_SERVERPORT  1883                   // use 8883 for SSL
+
+const char * MQTT_USERNAME = "";
+const char * MQTT_PASSWORD = "";
 
 char chip_id[9];
 
@@ -25,6 +31,9 @@ StaticJsonBuffer<512> jsonBuffer;
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
 #include <ESP8266httpUpdate.h>
+
+#include "Adafruit_MQTT.h"
+#include "Adafruit_MQTT_Client.h"
 
 #include <FS.h>
 
@@ -65,10 +74,48 @@ void sendTeperatureApi(char * str_address, float temp) {
   Serial.println("");
 }
 
+void sendTemperatureMQTT(char * str_address, float temp) {
+  WiFiClient client;
+  Adafruit_MQTT_Client mqtt(&client, MQTT_SERVER, MQTT_SERVERPORT, MQTT_USERNAME, MQTT_PASSWORD);
+
+  int8_t ret;
+  char topic[64];
+
+  if (strlen(MQTT_USERNAME) == 0 || strlen(MQTT_PASSWORD) == 0) {
+    return;
+  }
+
+  // Stop if already connected.
+  if (!mqtt.connected()) {
+    Serial.print("Connecting to MQTT... ");
+
+    uint8_t retries = 1;
+    while ((ret = mqtt.connect()) != 0) { // connect will return 0 for connected
+      Serial.println(mqtt.connectErrorString(ret));
+      Serial.println("Retrying MQTT connection in 5 seconds...");
+      mqtt.disconnect();
+      retries--;
+      if (retries == 0) {
+        // basically die and wait for WDT to reset me
+        return;
+      }
+      delay(2000);  // wait 5 seconds
+    }
+    Serial.println("MQTT Connected!");
+  }
+
+  memset(topic, 0, sizeof(topic));
+  sprintf(topic, "sensor/%s/temperature/%s", MQTT_USERNAME, str_address);
+  Adafruit_MQTT_Publish mqtt_publish = Adafruit_MQTT_Publish(&mqtt, topic);
+  mqtt_publish.publish(temp);
+  mqtt.disconnect();
+}
+
 void report_temperature() {
   float temp;
   uint8_t address[8];
   char str_address[18];
+
 
   /********************************************************************/
   Serial.print("Requesting temperatures...");
@@ -92,6 +139,7 @@ void report_temperature() {
     Serial.printf("[%d][%s] %.3f\n", i, str_address, temp);
     if (temp > DEVICE_DISCONNECTED_C) {
       sendTeperatureApi(str_address, temp);
+      sendTemperatureMQTT(str_address, temp);
     }
   }
 }
@@ -367,6 +415,16 @@ void get_config() {
     if (root.containsKey("apikey")) {
       APIKEY = root["apikey"];
       Serial.println("apikey: " + String(APIKEY));
+    }
+
+    if (root.containsKey("mqtt_user")) {
+      MQTT_USERNAME = root["mqtt_user"];
+      Serial.println("mqtt_user: " + String(MQTT_USERNAME));
+    }
+
+    if (root.containsKey("mqtt_pass")) {
+      MQTT_PASSWORD = root["mqtt_pass"];
+      Serial.println("mqtt_pass: " + String(MQTT_PASSWORD));
     }
 
     if (root.containsKey("version")) {
